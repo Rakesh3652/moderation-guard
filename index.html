@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Toxicity Severity Scanner — Live Demo</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Live Demo &middot; Severity Engine</div>
+    <h1>Toxicity Severity Scanner</h1>
+    <p>Type or paste a sentence — a real transformer model scores it across 7 toxicity categories and returns one severity tier.</p>
+  </header>
+
+  <div id="modelDemoSection">
+  <div class="status-bar">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusText">Loading AI model...</span>
+  </div>
+
+  <div class="panel">
+    <textarea id="inputText" placeholder="Type a sentence here..."></textarea>
+
+    <div class="examples" id="examples"></div>
+
+    <div class="actions">
+      <button class="scan-btn" id="scanBtn" onclick="scanText()">Scan Sentence</button>
+      <span class="hint">Press Enter to scan &middot; falls back to offline mode if there's no internet</span>
+    </div>
+
+    <div class="results" id="results">
+      <div class="highlight-box">
+        <div class="hb-label">Flagged terms in your sentence</div>
+        <div id="highlightedText">—</div>
+      </div>
+
+      <div class="sentiment-row" id="sentimentRow" style="display:none;">
+        <span class="sent-label">Overall tone:</span>
+        <span class="sentiment-pill" id="sentPill">—</span>
+        <span class="sent-conf" id="sentConf"></span>
+      </div>
+
+      <div class="tier-badge" id="tierBadge">
+        <div>
+          <div class="tier-name" id="tierName">Safe</div>
+          <div class="tier-desc" id="tierDesc">No action needed.</div>
+          <div class="tier-source" id="tierSource"></div>
+        </div>
+        <div class="tier-pct" id="tierPct">0%</div>
+      </div>
+
+      <div class="cat-grid" id="catGrid"></div>
+
+      <div class="note">
+        <strong>How this score is computed:</strong> when the AI model is available, each of the first 6 categories is
+        scored directly by a fine-tuned BERT toxicity classifier (Xenova/toxic-bert) running in your browser.
+        Self-Harm Encouragement always uses a dedicated high-recall keyword check, kept rule-based intentionally so
+        this safety-critical category never depends solely on a single model's confidence. Threat and Self-Harm
+        Encouragement scores are multiplied ×1.3 before a weighted-max aggregation produces the final severity score
+        (Safe 0–40% &middot; Mild 40–70% &middot; Toxic 70–90% &middot; Critical 90–100%).
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== IMAGE MODERATION SECTION (NEW) ===================== -->
+  <div class="panel" style="margin-top:24px;">
+    <h2 style="font-family:Georgia,serif;color:var(--navy);margin-top:0;">Image Moderation</h2>
+    <p class="hint" style="display:block;margin-bottom:14px;">Upload an image — checks for NSFW content and extracts/scores any text found in it (memes, screenshots, etc.)</p>
+
+    <div id="imgStatus" class="hint" style="margin-bottom:12px;">Loading image models...</div>
+
+    <div id="dropzone" style="
+      border:2px dashed #E3E8F5;border-radius:10px;padding:32px 20px;text-align:center;
+      color:var(--muted);cursor:pointer;margin-bottom:16px;">
+      Click to choose an image, or drag one here (GIFs supported)
+    </div>
+    <input type="file" id="imgFileInput" accept="image/*" style="display:none" />
+    <img id="imgPreview" style="max-width:100%;border-radius:10px;margin-bottom:16px;display:none;" />
+
+    <div id="imgResults" class="results"></div>
+  </div>
+  <!-- =================== END IMAGE MODERATION SECTION ========================= -->
+  </div>
+  <!-- ==================== end #modelDemoSection ==================== -->
+
+  <div id="extensionPageNotice" class="panel" style="display:none;margin-bottom:24px;background:var(--card);">
+    <p style="margin:0;color:var(--navy);font-size:14px;line-height:1.6;">
+      <strong>Text/image test panels are disabled in this view.</strong> Chrome doesn't allow an extension's own pages to load AI models from a CDN — that's a Manifest V3 security rule, not a bug. The real scanning happens automatically on the pages you browse, via the extension's content script. This dashboard only shows the results below. To try the models directly, open <code>index.html</code> through Live Server instead of through the extension.
+    </p>
+  </div>
+
+  <!-- ===================== EXTENSION DASHBOARD SECTION (NEW) ===================== -->
+  <div class="panel" style="margin-top:24px;">
+    <h2 style="font-family:Georgia,serif;color:var(--navy);margin-top:0;">Extension Activity</h2>
+    <p class="hint" style="display:block;margin-bottom:14px;">Content flagged by the browser extension while you browse. Only populated when this page is opened via the extension's "Open Dashboard" button — not when viewed as a plain webpage.</p>
+
+    <div id="dashboardStatus" class="hint" style="margin-bottom:12px;"></div>
+    <div id="dashboardControls" style="display:none;margin-bottom:14px;">
+      <button class="scan-btn" id="clearLogBtn" style="padding:9px 18px;font-size:13px;">Clear Log</button>
+    </div>
+    <div id="dashboardTableWrap"></div>
+  </div>
+  <!-- =================== END EXTENSION DASHBOARD SECTION ========================= -->
+
+  <footer>AI-Based Cyberbullying Detection &amp; Moderation System — Live Transformer-Model Demo</footer>
+</div>
+
+<script src="dashboard.js" defer></script>
+
+<script src="script.js" defer></script>
+<script type="module" src="image-app.js"></script>
+</body>
+</html>

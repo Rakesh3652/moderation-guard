@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Moderation Guard",
+  "version": "0.2.0",
+  "description": "Scans images and on-page text for toxicity, NSFW content, and harmful material — blurs mild content, hides toxic/critical content, and logs flagged items to a dashboard.",
+  "permissions": ["storage", "tabs", "notifications"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["vendor/tf-core.min.js", "vendor/tf-converter.min.js", "vendor/tf-backend-wasm.min.js","vendor/tesseract.min.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "image-moderation.js",
+        "text-score-lib.js",
+        "text-model.js",
+        "transformers-lib.js",
+        "clip-model.js",
+        "models/mobilenet_v2/*",
+        "vendor/*",
+        "index.html",
+        "style.css",
+        "script.js",
+        "image-app.js",
+        "dashboard.js"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
